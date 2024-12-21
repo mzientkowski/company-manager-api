@@ -15,6 +15,9 @@
 default: &default
   adapter: postgresql
   encoding: unicode
+  host: <%= ENV.fetch("POSTGRES_HOST") { 'localhost' } %>
+  username: <%= ENV.fetch("POSTGRES_USER") { 'postgres' } %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD") { 'postgres' } %>
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
@@ -81,5 +84,3 @@ test:
 production:
   <<: *default
   database: company_manager_api_production
-  username: company_manager_api
-  password: <%= ENV["COMPANY_MANAGER_API_DATABASE_PASSWORD"] %>
