@@ -25,6 +25,8 @@ gem "thruster", require: false
 gem 'rswag-api'
 gem 'rswag-ui'
 
+gem 'pry'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -36,9 +38,9 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 
   gem 'rspec-rails', '~> 7.0.0'
+  gem 'rspec-snapshot'
 
   gem 'factory_bot_rails', '~> 6.0'
-  gem 'pry'
 
   gem 'rswag-specs'
 end

@@ -3,3 +3,80 @@ openapi: 3.0.1
 info:
   title: Company Manager API V1
   version: v1
+components:
+  schemas:
+    bad_request:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+    address:
+      type: object
+      properties:
+        street:
+          type: string
+        city:
+          type: string
+        postal_code:
+          type: string
+          nullable: true
+        country:
+          type: string
+      required:
+      - street
+      - city
+      - country
+    addresses:
+      type: array
+      items:
+        "$ref": "#/components/schemas/address"
+    company:
+      type: object
+      properties:
+        name:
+          type: string
+        registration_number:
+          type: integer
+        addresses:
+          "$ref": "#/components/schemas/addresses"
+      required:
+      - name
+      - registration_number
+paths:
+  "/api/v1/companies":
+    post:
+      summary: Create a Company with Addresses
+      tags:
+      - Companies
+      parameters: []
+      responses:
+        '201':
+          description: Company created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/company"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/bad_request"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                registration_number:
+                  type: integer
+                addresses_attributes:
+                  "$ref": "#/components/schemas/addresses"
+              required:
+              - name
+              - registration_number
+              - addresses_attributes
