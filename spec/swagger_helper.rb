@@ -20,6 +20,42 @@ RSpec.configure do |config|
       info: {
         title: 'Company Manager API V1',
         version: 'v1'
+      },
+      components: {
+        schemas: {
+          bad_request: {
+            type: 'object',
+            properties: {
+              errors: {
+                type: :array,
+                items: { type: :string },
+              }
+            }
+          },
+          address: {
+            type: :object,
+            properties: {
+              street: { type: :string },
+              city: { type: :string },
+              postal_code: { type: :string, nullable: true },
+              country: { type: :string }
+            },
+            required: %i[street city country]
+          },
+          addresses: {
+            type: :array,
+            items: { '$ref' => '#/components/schemas/address' },
+          },
+          company: {
+            type: 'object',
+            properties: {
+              name: { type: :string },
+              registration_number: { type: :integer },
+              addresses: { '$ref' => '#/components/schemas/addresses' }
+            },
+            required: %i[name registration_number]
+          }
+        }
       }
     }
   }
@@ -29,4 +65,6 @@ RSpec.configure do |config|
   # the key, this may want to be changed to avoid putting yaml in json files.
   # Defaults to json. Accepts ':json' and ':yaml'.
   config.openapi_format = :yaml
+
+  config.openapi_strict_schema_validation = true
 end

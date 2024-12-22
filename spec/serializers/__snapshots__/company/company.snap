@@ -1,0 +1,18 @@
+{
+                 "name" => "Test Company",
+  "registration_number" => 123456789,
+            "addresses" => [
+    [0] {
+           "street" => "123 Main St",
+             "city" => "New York",
+      "postal_code" => "10001",
+          "country" => "USA"
+    },
+    [1] {
+           "street" => "456 Elm St",
+             "city" => "Los Angeles",
+      "postal_code" => "90001",
+          "country" => "USA"
+    }
+  ]
+}
