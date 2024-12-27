@@ -1,0 +1,22 @@
+{
+   "errors" => [
+    [0] "Name can't be blank",
+    [1] "Registration number can't be blank",
+    [2] "Registration number is not a number",
+    [3] "Addresses must have at least one"
+  ],
+  "details" => [
+    [0] {
+                     "name" => [
+        [0] "can't be blank"
+      ],
+      "registration_number" => [
+        [0] "can't be blank",
+        [1] "is not a number"
+      ],
+                "addresses" => [
+        [0] "must have at least one"
+      ]
+    }
+  ]
+}

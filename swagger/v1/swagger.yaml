@@ -12,9 +12,17 @@ components:
           type: array
           items:
             type: string
+        details:
+          type: array
+          items:
+            type: object
+      required:
+      - errors
     address:
       type: object
       properties:
+        id:
+          type: integer
         street:
           type: string
         city:
@@ -25,6 +33,7 @@ components:
         country:
           type: string
       required:
+      - id
       - street
       - city
       - country
@@ -35,6 +44,8 @@ components:
     company:
       type: object
       properties:
+        id:
+          type: integer
         name:
           type: string
         registration_number:
@@ -42,6 +53,7 @@ components:
         addresses:
           "$ref": "#/components/schemas/addresses"
       required:
+      - id
       - name
       - registration_number
 paths:
@@ -80,3 +92,46 @@ paths:
               - name
               - registration_number
               - addresses_attributes
+  "/api/v1/companies/import":
+    post:
+      summary: Bulk Import Companies via CSV
+      tags:
+      - Companies
+      parameters: []
+      responses:
+        '201':
+          description: Companies imported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/company"
+                  metadata:
+                    type: object
+                    properties:
+                      total_count:
+                        type: number
+                required:
+                - data
+                - metadata
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/bad_request"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+              - file

@@ -24,36 +24,42 @@ RSpec.configure do |config|
       components: {
         schemas: {
           bad_request: {
-            type: 'object',
+            type: :object,
             properties: {
               errors: {
                 type: :array,
                 items: { type: :string },
+              },
+              details: {
+                type: :array,
+                items: { type: :object },
               }
-            }
+            }, required: %i[errors]
           },
           address: {
             type: :object,
             properties: {
+              id: { type: :integer },
               street: { type: :string },
               city: { type: :string },
               postal_code: { type: :string, nullable: true },
               country: { type: :string }
             },
-            required: %i[street city country]
+            required: %i[id street city country]
           },
           addresses: {
             type: :array,
             items: { '$ref' => '#/components/schemas/address' },
           },
           company: {
-            type: 'object',
+            type: :object,
             properties: {
+              id: { type: :integer },
               name: { type: :string },
               registration_number: { type: :integer },
               addresses: { '$ref' => '#/components/schemas/addresses' }
             },
-            required: %i[name registration_number]
+            required: %i[id name registration_number]
           }
         }
       }
@@ -66,5 +72,5 @@ RSpec.configure do |config|
   # Defaults to json. Accepts ':json' and ':yaml'.
   config.openapi_format = :yaml
 
-  config.openapi_strict_schema_validation = true
+  config.openapi_all_properties_required = true
 end

@@ -22,14 +22,15 @@ gem "thruster", require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
 
-gem 'rswag-api'
-gem 'rswag-ui'
+gem "csv"
 
-gem 'pry'
+gem "rswag-api"
+gem "rswag-ui"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  gem "pry"
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
@@ -37,14 +38,12 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 
-  gem 'rspec-rails', '~> 7.0.0'
-  gem 'rspec-snapshot'
-
-  gem 'factory_bot_rails', '~> 6.0'
-
-  gem 'rswag-specs'
+  gem "rspec-rails", "~> 7.0.0"
+  gem "rspec-snapshot"
+  gem "factory_bot_rails", "~> 6.0"
+  gem "rswag-specs"
 end
 
 group :test do
-  gem 'shoulda-matchers', '~> 6.0'
+  gem "shoulda-matchers", "~> 6.0"
 end

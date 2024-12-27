@@ -1,0 +1,4 @@
+name,registration_number,street,city,postal_code,country
+Example Co,123456789,123 Main St,New York,10001,USA
+Example Co,123456789,456 Elm St,Los Angeles,90001,USA
+Another Co,987654321,789 Oak St,Chicago,60601,USA
