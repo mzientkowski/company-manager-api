@@ -1,15 +1,18 @@
 [
   [0] {
+                     "id" => nil,
                    "name" => "Test Company",
     "registration_number" => 123456789,
               "addresses" => [
       [0] {
+                 "id" => nil,
              "street" => "123 Main St",
                "city" => "New York",
         "postal_code" => "10001",
             "country" => "USA"
       },
       [1] {
+                 "id" => nil,
              "street" => "456 Elm St",
                "city" => "Los Angeles",
         "postal_code" => "90001",

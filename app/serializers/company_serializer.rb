@@ -9,10 +9,10 @@ class CompanySerializer
 
   def as_json(*args)
     object.as_json(
-      only: %i[name registration_number],
+      only: %i[id name registration_number],
       include: {
         addresses: {
-          only: %i[street city postal_code country]
+          only: %i[id street city postal_code country]
         }
       }
     )

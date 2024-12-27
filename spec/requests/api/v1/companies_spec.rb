@@ -35,11 +35,100 @@ describe 'Companies API' do
 
         run_test! do |response|
           json = JSON.parse(response.body)
-          expect(json['errors']).to eq(["Name can't be blank",
-                                        "Registration number can't be blank",
-                                        "Registration number is not a number",
-                                        "Addresses must have at least one"
-                                       ])
+          expect(json).to match_snapshot('requests/api/v1/companies/create_bad_request')
+        end
+      end
+
+      path '/api/v1/companies/import' do
+        post 'Bulk Import Companies via CSV' do
+          tags 'Companies'
+          consumes 'multipart/form-data'
+          produces 'application/json'
+
+          parameter name: :file, in: :formData, schema: {
+            type: :object,
+            properties: {
+              file: { type: :string, format: :binary }
+            },
+            required: [:file]
+          }
+
+          response '201', 'Companies imported successfully' do
+            schema type: :object,
+                   properties: {
+                     data: { type: :array,
+                             items: { '$ref' => '#/components/schemas/company' }
+                     },
+                     metadata: { type: :object,
+                                 properties: {
+                                   total_count: { type: :number }
+                                 }
+                     }
+                   },
+                   required: [:data, :metadata]
+            let(:file) { fixture_file_upload('companies.csv', 'text/csv') }
+
+            run_test! do |response|
+              json = JSON.parse(response.body)
+              expect(json['data'].size).to eq(2)
+              expect(Company.count).to eq(2)
+
+              json['data'] = json['data'].map { |c| c.deep_except!("id") }
+              expect(json).to match_snapshot('requests/api/v1/companies/import')
+            end
+          end
+
+          response '400', 'Invalid CSV file' do
+            schema '$ref' => '#/components/schemas/bad_request'
+            let(:file) { fixture_file_upload('invalid_data_companies.csv', 'text/csv') }
+
+            run_test! do |response|
+              json = JSON.parse(response.body)
+              expect(json['errors']).to eq([ "Addresses street can't be blank", "Csv invalid data for company starting at row: 4" ])
+              expect(Company.count).to eq(0)
+            end
+          end
+
+          context "with duplicates" do
+            response '400', 'Invalid CSV file' do
+              schema '$ref' => '#/components/schemas/bad_request'
+              let(:file) { fixture_file_upload('invalid_uniq_companies.csv', 'text/csv') }
+
+              run_test! do |response|
+                json = JSON.parse(response.body)
+                expect(json['errors']).to eq([ "Registration number has already been taken", "Csv invalid data for company starting at row: 4" ])
+                expect(Company.count).to eq(0)
+              end
+            end
+
+            context "when company already exist in db" do
+              before do
+                create(:company, registration_number: 123456789)
+              end
+
+              response '400', 'Data already exists in db' do
+                schema '$ref' => '#/components/schemas/bad_request'
+                let(:file) { fixture_file_upload('companies.csv', 'text/csv') }
+
+                run_test! do |response|
+                  json = JSON.parse(response.body)
+                  expect(json['errors']).to eq([ "Registration number has already been taken", "Csv invalid data for company starting at row: 2" ])
+                  expect(Company.count).to eq(1)
+                  expect(Address.count).to eq(1)
+                end
+              end
+            end
+          end
+
+          response '400', 'Bad request' do
+            schema '$ref' => '#/components/schemas/bad_request'
+            let(:file) { }
+
+            run_test! do |response|
+              json = JSON.parse(response.body)
+              expect(json['errors']).to eq(["param is missing or the value is empty or invalid: file"])
+            end
+          end
         end
       end
     end

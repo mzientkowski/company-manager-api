@@ -8,7 +8,9 @@ FactoryBot.define do
     end
 
     after(:build) do |company, evaluator|
-      company.addresses ||= build_list(:address, evaluator.addresses_count, company: company)
+      if company.addresses.empty?
+        company.addresses = build_list(:address, evaluator.addresses_count, company: company)
+      end
     end
   end
 end

@@ -13,9 +13,8 @@ describe Company do
     it { should validate_numericality_of(:registration_number).only_integer }
 
     context 'addresses validation' do
-      let(:company) { build(:company, addresses: []) }
-
       it 'is invalid without at least one address' do
+        company.addresses = []
         expect(company).to_not be_valid
         expect(company.errors[:addresses]).to include("must have at least one")
       end
