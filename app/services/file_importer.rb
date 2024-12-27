@@ -31,7 +31,7 @@ class FileImporter
         if obj.save
           imported_objects << obj
         else
-          errors.push(*obj.errors)
+          errors << obj.errors
           imported_objects.clear
           raise ActiveRecord::Rollback
         end

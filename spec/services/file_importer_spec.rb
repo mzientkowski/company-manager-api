@@ -41,7 +41,7 @@ describe FileImporter do
           importer = described_class.new(file_parser)
 
           expect(importer.import).to eq(false)
-          expect(importer.errors).to include('Invalid data')
+          expect(importer.errors).to include([ 'Invalid data' ])
           expect(importer.imported_objects).to be_empty
         end
       end
