@@ -1,4 +1,22 @@
+networks:
+  company_manager_net:
+    driver: bridge
 services:
+  app:
+    build: .
+    environment:
+      RAILS_ENV: 'production'
+      RAILS_MASTER_KEY: '0d063701679bd9c333c335e74e3a3985' # FIXME: keep secret
+      POSTGRES_HOST: postgres-docker
+      POSTGRES_USER: 'postgres' # FIXME: keep secret
+      POSTGRES_PASSWORD: 'postgres' # FIXME: keep secret
+    command: bundle exec rails s -b '0.0.0.0'
+    volumes:
+      - .:/rails
+    ports:
+      - "3000:3000"
+    networks:
+      - company_manager_net
   postgres-docker:
     image: public.ecr.aws/docker/library/postgres:16.1-alpine3.18
     environment:
@@ -9,7 +27,9 @@ services:
     volumes:
       - postgres:/data/postgres
     ports:
-      - 5432:5432
+      - "5432:5432"
+    networks:
+      - company_manager_net
     restart: unless-stopped
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
