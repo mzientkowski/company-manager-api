@@ -22,6 +22,11 @@ class Api::V1::CompaniesController < ApplicationController
     end
   end
 
+  def import_async
+    # FIXME: import_file should be persisted before delegating job
+    ImportCompaniesJob.perform_later(import_file_param.path)
+  end
+
   private
 
   def import_file_param

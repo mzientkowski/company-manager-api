@@ -24,9 +24,13 @@ default: &default
 
 
 development:
-  <<: *default
-  database: company_manager_api_development
-
+  primary:
+    <<: *default
+    database: company_manager_api_development
+  queue:
+    <<: *default
+    database: queue_development
+    migrations_paths: db/queue_migrate
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
   # When left blank, PostgreSQL will use the default role. This is
@@ -82,5 +86,10 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  <<: *default
-  database: company_manager_api_production
+  primary:
+    <<: *default
+    database: company_manager_api_production
+  queue:
+    <<: *default
+    database: queue_production
+    migrations_paths: db/queue_migrate
