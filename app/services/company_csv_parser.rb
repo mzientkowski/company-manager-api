@@ -21,6 +21,7 @@ class CompanyCsvParser
   end
 
   def each
+    return enum_for(__method__) unless block_given?
     CSV.foreach(file_path, **CSV_OPTIONS).with_index(2) do |row, idx|
       company_builder.add_row(row.to_h, idx) do |company|
         yield company

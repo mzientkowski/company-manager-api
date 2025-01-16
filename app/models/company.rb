@@ -3,6 +3,6 @@ class Company < ApplicationRecord
   accepts_nested_attributes_for :addresses
 
   validates :name, presence: true, length: { maximum: 256 }
-  validates :registration_number, presence: true, uniqueness: true, numericality: { only_integer: true }
+  validates :registration_number, presence: true, uniqueness: true, numericality: { only_integer: true, greater_than: 0 }
   validates :addresses, presence: { message: "must have at least one" }
 end
