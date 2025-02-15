@@ -10,9 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_15_065556) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_15_115702) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  # Custom types defined in this database.
+  # Note that some types may not work with other database engines. Be careful if changing database.
+  create_enum "import_status", ["pending", "running", "completed", "failed"]
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -58,7 +62,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_15_065556) do
     t.integer "registration_number", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "import_id"
+    t.index ["import_id"], name: "index_companies_on_import_id"
     t.index ["registration_number"], name: "index_companies_on_registration_number", unique: true
+  end
+
+  create_table "imports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.enum "status", default: "pending", null: false, enum_type: "import_status"
+    t.integer "total_count", default: 0, null: false
+    t.integer "imported_count", default: 0, null: false
+    t.integer "failed_count", default: 0, null: false
+    t.text "error_log", default: [], array: true
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["status"], name: "index_imports_on_status"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
