@@ -9,4 +9,23 @@ class Import < ApplicationRecord
   def check_file_presence
     errors.add(:file, "no file") unless file.attached?
   end
+
+  def file_path
+    ActiveStorage::Blob.service.path_for(file.key)
+  end
+
+  def run!
+    update!(status: Import.statuses[:running], started_at: Time.current)
+    begin
+      file_importer = FileImporter.new(self, CompanyCsvParser.new(file_path))
+      if file_importer.import
+        update!(status: Import.statuses[:completed], imported_count: file_importer.imported_objects.size, completed_at: Time.current)
+      else
+        update!(status: Import.statuses[:failed], error_log: file_importer.errors.map(&:full_messages))
+      end
+    rescue => exception
+      update!(status: Import.statuses[:failed], error_log: self.error_log << exception.message)
+      raise
+    end
+  end
 end

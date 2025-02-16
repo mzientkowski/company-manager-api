@@ -10,24 +10,34 @@ class Api::V1::CompaniesController < ApplicationController
   end
 
   def import
-    importer = FileImporter.new(CompanyCsvParser.new(import_file_param.path))
+    import = create_import
+    import.run!
 
-    if importer.import
+    if import.completed?
+      imported_companies = Company.where(import_id: import.id).includes(:addresses)
       render json: {
-        data: CompanySerializer.list(importer.imported_objects),
-        metadata: { total_count: importer.imported_objects.size }
+        data: CompanySerializer.list(imported_companies),
+        metadata: { total_count: import.imported_count }
       }, status: :created
     else
-      bad_request(importer.errors)
+      bad_request(import.error_log)
     end
   end
 
   def import_async
-    # FIXME: import_file should be persisted before delegating job
-    ImportCompaniesJob.perform_later(import_file_param.path)
+    import_id = create_import.id
+    ImportCompaniesJob.perform_later(import_id)
+
+    render json: {
+      import_id: import_id
+    }, status: :created
   end
 
   private
+
+  def create_import
+    Import.create!(file: import_file_param)
+  end
 
   def import_file_param
     params.expect(:file)

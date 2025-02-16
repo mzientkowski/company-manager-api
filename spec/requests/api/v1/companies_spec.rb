@@ -50,7 +50,7 @@ describe 'Companies API' do
             properties: {
               file: { type: :string, format: :binary }
             },
-            required: [:file]
+            required: [ :file ]
           }
 
           response '201', 'Companies imported successfully' do
@@ -65,7 +65,7 @@ describe 'Companies API' do
                                  }
                      }
                    },
-                   required: [:data, :metadata]
+                   required: [ :data, :metadata ]
             let(:file) { fixture_file_upload('companies.csv', 'text/csv') }
 
             run_test! do |response|
@@ -126,7 +126,57 @@ describe 'Companies API' do
 
             run_test! do |response|
               json = JSON.parse(response.body)
-              expect(json['errors']).to eq(["param is missing or the value is empty or invalid: file"])
+              expect(json['errors']).to eq([ "param is missing or the value is empty or invalid: file" ])
+            end
+          end
+        end
+      end
+
+      path '/api/v1/companies/import_async' do
+        post 'Bulk async Import Companies via CSV' do
+          tags 'Companies'
+          consumes 'multipart/form-data'
+          produces 'application/json'
+
+          parameter name: :file, in: :formData, schema: {
+            type: :object,
+            properties: {
+              file: { type: :string, format: :binary }
+            },
+            required: [ :file ]
+          }
+
+          response '201', 'Companies import created successfully' do
+            schema type: :object,
+                   properties: {
+                     import_id: { type: :string }
+                   },
+                   required: [ :import_id ]
+            let(:file) { fixture_file_upload('companies.csv', 'text/csv') }
+
+            before do
+              ActiveJob::Base.queue_adapter.enqueued_jobs = []
+            end
+
+            run_test! do |response|
+              import_id = JSON.parse(response.body).fetch('import_id')
+              import = Import.find(import_id)
+              expect(import.status).to eq(Import.statuses[:pending])
+
+              scheduled_jobs = ActiveJob::Base.queue_adapter.enqueued_jobs
+              expect(scheduled_jobs.count).to eq(1)
+              expect(scheduled_jobs.first['job_class']).to eq('ImportCompaniesJob')
+              expect(scheduled_jobs.first['arguments']).to eq([ import_id ])
+            end
+          end
+
+          response '400', 'Bad request' do
+            schema '$ref' => '#/components/schemas/bad_request'
+            let(:file) { }
+
+            run_test! do |response|
+              json = JSON.parse(response.body)
+              expect(json['errors']).to eq([ "param is missing or the value is empty or invalid: file" ])
             end
           end
         end

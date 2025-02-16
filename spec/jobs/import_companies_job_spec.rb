@@ -1,9 +1,7 @@
 describe ImportCompaniesJob do
-  let(:file_path) { 'spec/fixtures/files/companies.csv' }
-  let(:parser) { instance_double(CompanyCsvParser) }
-  let(:importer) { instance_double(FileImporter) }
+  let(:import) { instance_double(Import, id: 'import_uuid') }
 
-  subject(:job) { described_class.perform_later(file_path) }
+  subject(:job) { described_class.perform_later(import.id) }
 
   after do
     clear_enqueued_jobs
@@ -12,15 +10,14 @@ describe ImportCompaniesJob do
 
   it 'queues the job' do
     expect { job }.to have_enqueued_job(described_class)
-      .with(file_path)
+      .with(import.id)
       .on_queue("default")
   end
 
   it 'executes perform' do
-    expect(CompanyCsvParser).to receive(:new).with(file_path).and_return(parser)
-    expect(FileImporter).to receive(:new).with(parser).and_return(importer)
+    expect(Import).to receive(:find).with(import.id).and_return(import)
+    expect(import).to receive(:run!)
 
-    expect(importer).to receive(:import)
     perform_enqueued_jobs { job }
   end
 end

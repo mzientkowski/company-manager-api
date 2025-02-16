@@ -1,5 +1,6 @@
 class FileImporter
-  def initialize(file_parser)
+  def initialize(import_obj, file_parser)
+    @import_obj= import_obj
     @file_parser = file_parser
   end
 
@@ -23,11 +24,12 @@ class FileImporter
 
   private
 
-  attr_reader :file_parser
+  attr_reader :file_parser, :import_obj
 
   def import_to_db
     ActiveRecord::Base.transaction do
       file_parser.each do |obj|
+        obj.import_id = import_obj.id
         if obj.save
           imported_objects << obj
         else
@@ -39,4 +41,3 @@ class FileImporter
     end
   end
 end
-
