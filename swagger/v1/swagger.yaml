@@ -135,3 +135,38 @@ paths:
                   format: binary
               required:
               - file
+  "/api/v1/companies/import_async":
+    post:
+      summary: Bulk async Import Companies via CSV
+      tags:
+      - Companies
+      parameters: []
+      responses:
+        '201':
+          description: Companies import created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  import_id:
+                    type: string
+                required:
+                - import_id
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/bad_request"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+              - file

@@ -43,4 +43,55 @@ describe Import, type: :model do
     it { should have_db_column(:completed_at).of_type(:datetime) }
     it { should have_db_index(:status) }
   end
+
+  describe '#file_path' do
+    it 'returns the correct file path' do
+      expect(import.file_path).to eq(ActiveStorage::Blob.service.path_for(import.file.key))
+    end
+  end
+
+  describe '#run!' do
+    let(:company_csv_parser) { instance_double(CompanyCsvParser) }
+    let(:file_importer) { instance_double(FileImporter, import: true, imported_objects: [ double, double ], errors: []) }
+
+    before do
+      allow(CompanyCsvParser).to receive(:new).with(import.file_path).and_return(company_csv_parser)
+      allow(FileImporter).to receive(:new).with(import, company_csv_parser).and_return(file_importer)
+    end
+
+    context 'when import is successful' do
+      it 'updates status to completed, timestamps and sets imported_count' do
+        import.run!
+
+        expect(import.started_at).to be_a(ActiveSupport::TimeWithZone)
+        expect(import.completed_at).to be_a(ActiveSupport::TimeWithZone)
+
+        expect(import.status).to eq('completed')
+        expect(import.imported_count).to eq(2)
+      end
+    end
+
+    context 'when import fails' do
+      let(:file_importer) { instance_double(FileImporter, import: false, imported_objects: [], errors: [ double(full_messages: 'Error importing') ]) }
+
+      it 'updates status to failed and stores errors' do
+        import.run!
+
+        expect(import.status).to eq('failed')
+        expect(import.error_log).to include('Error importing')
+      end
+    end
+
+    context 'when an exception occurs' do
+      before do
+        allow(file_importer).to receive(:import).and_raise(StandardError.new('Unexpected error'))
+      end
+
+      it 'updates status to failed, stores error and raises the exception' do
+        expect { import.run! }.to raise_error(StandardError, 'Unexpected error')
+        expect(import.status).to eq('failed')
+        expect(import.error_log).to include('Unexpected error')
+      end
+    end
+  end
 end
