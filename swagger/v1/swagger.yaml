@@ -5,6 +5,28 @@ info:
   version: v1
 components:
   schemas:
+    pagination:
+      type: object
+      properties:
+        count:
+          type: number
+        pages:
+          type: number
+        limit:
+          type: number
+        page:
+          type: number
+        next:
+          type: number
+          nullable: true
+        prev:
+          type: number
+          nullable: true
+      required:
+      - count
+      - pages
+      - limit
+      - page
     bad_request:
       type: object
       properties:
@@ -58,6 +80,41 @@ components:
       - registration_number
 paths:
   "/api/v1/companies":
+    get:
+      summary: Retrieves Companies
+      parameters:
+      - name: page[number]
+        in: query
+        required: false
+        schema:
+          type: number
+      - name: page[limit]
+        in: query
+        required: false
+        schema:
+          type: number
+      - name: filter[import_id]
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Companies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/company"
+                  pagination:
+                    "$ref": "#/components/schemas/pagination"
+                required:
+                - data
+                - pagination
     post:
       summary: Create a Company with Addresses
       tags:

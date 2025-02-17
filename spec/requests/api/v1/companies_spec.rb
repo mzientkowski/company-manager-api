@@ -2,6 +2,58 @@ require 'swagger_helper'
 
 describe 'Companies API' do
   path '/api/v1/companies' do
+    get 'Retrieves Companies' do
+      parameter name: "page[number]", in: :query, type: :number, required: false, getter: :page_number
+      parameter name: "page[limit]", in: :query, type: :number, required: false, getter: :page_limit
+      parameter name: "filter[import_id]", in: :query, type: :string, required: false, getter: :filter_import_id
+      produces 'application/json'
+
+      before do
+        create(:company, name: 'Example Co#1', registration_number: 123456789, import_id: SecureRandom.uuid, addresses: [
+          build(:address, street: '456 Elm St', city: 'New York', postal_code: '90001'),
+          build(:address, street: '123 Main St', city: 'New York', postal_code: '10001')
+        ])
+        create(:company, name: 'Example Co#2', registration_number: 987654321, addresses: [
+          build(:address, street: '789 Oak St', city: 'Chicago', postal_code: '60601')
+        ])
+      end
+
+      response '200', 'Companies paginated' do
+        schema '$ref' => '#/components/schemas/companies_index'
+
+        let(:page_number) { 2 }
+        let(:page_limit) { 1 }
+
+        run_test! do |response|
+          json = JSON.parse(response.body)
+          json['data'] = json['data'].map { |c| c.deep_except!("id") }
+          expect(json).to match_snapshot('requests/api/v1/companies/companies_paginated')
+        end
+      end
+
+      response '200', 'Companies filtred by import_id' do
+        schema '$ref' => '#/components/schemas/companies_index'
+
+        let(:filter_import_id) { Company.first.import_id }
+
+        run_test! do |response|
+          json = JSON.parse(response.body)
+          json['data'] = json['data'].map { |c| c.deep_except!("id") }
+          expect(json).to match_snapshot('requests/api/v1/companies/companies_filtred_by_import_id')
+        end
+      end
+
+      response '200', 'Companies' do
+         schema '$ref' => '#/components/schemas/companies_index'
+
+        run_test! do |response|
+          json = JSON.parse(response.body)
+          json['data'] = json['data'].map { |c| c.deep_except!("id") }
+          expect(json).to match_snapshot('requests/api/v1/companies/companies')
+        end
+      end
+    end
+
     post 'Create a Company with Addresses' do
       tags 'Companies'
       consumes 'application/json'

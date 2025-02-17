@@ -1,4 +1,17 @@
 class Api::V1::CompaniesController < ApplicationController
+  include Pagy::Backend
+
+  def index
+    scope = Company.all.includes(:addresses)
+    scope = scope.where(import_id: index_filter_params[:import_id]) if index_filter_params[:import_id].present?
+    pagy, records = pagy(scope, **page_params)
+
+    render json: {
+      data: CompanySerializer.list(records),
+      pagination: pagy_metadata(pagy)
+    }, status: :ok
+  end
+
   def create
     company = Company.new(company_params)
 
@@ -37,6 +50,14 @@ class Api::V1::CompaniesController < ApplicationController
 
   def create_import
     Import.create!(file: import_file_param)
+  end
+
+  def index_filter_params
+    params.fetch(:filter, {}).permit(:import_id)
+  end
+
+  def page_params
+    params.fetch(:page, {}).permit(:number, :limit).to_h.symbolize_keys
   end
 
   def import_file_param

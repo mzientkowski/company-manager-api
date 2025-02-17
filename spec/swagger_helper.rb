@@ -23,16 +23,27 @@ RSpec.configure do |config|
       },
       components: {
         schemas: {
+          pagination: {
+            type: :object,
+            properties: {
+              count: { type: :number },
+              pages: { type: :number },
+              limit: { type: :number },
+              page: { type: :number },
+              next: { type: :number, nullable: true },
+              prev: { type: :number, nullable: true }
+            }, required: %i[count pages limit page]
+          },
           bad_request: {
             type: :object,
             properties: {
               errors: {
                 type: :array,
-                items: { type: :string },
+                items: { type: :string }
               },
               details: {
                 type: :array,
-                items: { type: :object },
+                items: { type: :object }
               }
             }, required: %i[errors]
           },
@@ -49,7 +60,7 @@ RSpec.configure do |config|
           },
           addresses: {
             type: :array,
-            items: { '$ref' => '#/components/schemas/address' },
+            items: { '$ref' => '#/components/schemas/address' }
           },
           company: {
             type: :object,
@@ -60,6 +71,18 @@ RSpec.configure do |config|
               addresses: { '$ref' => '#/components/schemas/addresses' }
             },
             required: %i[id name registration_number]
+          },
+          companies: {
+            type: :array,
+            items: { '$ref' => '#/components/schemas/company' }
+          },
+          companies_index: {
+            type: :object,
+            properties: {
+              data: { '$ref' => '#/components/schemas/companies' },
+              pagination: { '$ref' => '#/components/schemas/pagination' }
+            },
+            required: [ :data, :pagination ]
           }
         }
       }

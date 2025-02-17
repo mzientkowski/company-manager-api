@@ -1,0 +1,42 @@
+{
+        "data" => [
+    [0] {
+                     "name" => "Example Co#1",
+      "registration_number" => 123456789,
+                "addresses" => [
+        [0] {
+               "street" => "456 Elm St",
+                 "city" => "New York",
+          "postal_code" => "90001",
+              "country" => "USA"
+        },
+        [1] {
+               "street" => "123 Main St",
+                 "city" => "New York",
+          "postal_code" => "10001",
+              "country" => "USA"
+        }
+      ]
+    },
+    [1] {
+                     "name" => "Example Co#2",
+      "registration_number" => 987654321,
+                "addresses" => [
+        [0] {
+               "street" => "789 Oak St",
+                 "city" => "Chicago",
+          "postal_code" => "60601",
+              "country" => "USA"
+        }
+      ]
+    }
+  ],
+  "pagination" => {
+    "count" => 2,
+    "pages" => 1,
+    "limit" => 20,
+     "page" => 1,
+     "next" => nil,
+     "prev" => nil
+  }
+}
