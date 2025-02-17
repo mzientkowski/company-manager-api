@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: imports
+#
+#  id             :uuid             not null, primary key
+#  completed_at   :datetime
+#  error_log      :text             default([]), is an Array
+#  failed_count   :integer          default(0), not null
+#  imported_count :integer          default(0), not null
+#  started_at     :datetime
+#  status         :enum             default("pending"), not null
+#  total_count    :integer          default(0), not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#
+# Indexes
+#
+#  index_imports_on_status  (status)
+#
 class Import < ApplicationRecord
   enum :status, { pending: "pending", running: "running", completed: "completed", failed: "failed" }
 

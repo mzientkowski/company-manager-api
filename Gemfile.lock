@@ -74,6 +74,7 @@ GEM
       uri (>= 0.13.1)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
+    annotaterb (4.13.0)
     ast (2.4.2)
     awesome_print (1.9.2)
     base64 (0.2.0)
@@ -100,6 +101,35 @@ GEM
       reline (>= 0.3.8)
     diff-lcs (1.5.1)
     drb (2.2.1)
+    dry-configurable (1.3.0)
+      dry-core (~> 1.1)
+      zeitwerk (~> 2.6)
+    dry-core (1.1.0)
+      concurrent-ruby (~> 1.0)
+      logger
+      zeitwerk (~> 2.6)
+    dry-inflector (1.2.0)
+    dry-initializer (3.2.0)
+    dry-logic (1.6.0)
+      bigdecimal
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.1)
+      zeitwerk (~> 2.6)
+    dry-schema (1.13.4)
+      concurrent-ruby (~> 1.0)
+      dry-configurable (~> 1.0, >= 1.0.1)
+      dry-core (~> 1.0, < 2)
+      dry-initializer (~> 3.0)
+      dry-logic (>= 1.4, < 2)
+      dry-types (>= 1.7, < 2)
+      zeitwerk (~> 2.6)
+    dry-types (1.8.2)
+      bigdecimal (~> 3.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.0)
+      dry-inflector (~> 1.0)
+      dry-logic (~> 1.4)
+      zeitwerk (~> 2.6)
     erubi (1.13.1)
     et-orbi (1.2.11)
       tzinfo
@@ -108,6 +138,8 @@ GEM
     factory_bot_rails (6.4.4)
       factory_bot (~> 6.5)
       railties (>= 5.0.0)
+    fasterer (0.11.0)
+      ruby_parser (>= 3.19.1)
     fugit (1.11.1)
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
@@ -236,9 +268,16 @@ GEM
     rake (13.2.1)
     rdoc (6.10.0)
       psych (>= 4.0.0)
+    reek (6.4.0)
+      dry-schema (~> 1.13.0)
+      logger (~> 1.6)
+      parser (~> 3.3.0)
+      rainbow (>= 2.0, < 4.0)
+      rexml (~> 3.1)
     regexp_parser (2.9.3)
     reline (0.6.0)
       io-console (~> 0.5)
+    rexml (3.4.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -303,7 +342,11 @@ GEM
       rubocop-performance
       rubocop-rails
     ruby-progressbar (1.13.0)
+    ruby_parser (3.21.1)
+      racc (~> 1.5)
+      sexp_processor (~> 4.16)
     securerandom (0.4.1)
+    sexp_processor (4.17.3)
     shoulda-matchers (6.4.0)
       activesupport (>= 5.2.0)
     solid_queue (1.1.2)
@@ -342,12 +385,15 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  annotaterb
+  awesome_print
   bootsnap
   brakeman
   bundle-audit
   csv
   debug
   factory_bot_rails (~> 6.0)
+  fasterer
   mission_control-jobs
   pagy
   pg (~> 1.1)
@@ -355,6 +401,7 @@ DEPENDENCIES
   pry
   puma (>= 5.0)
   rails (~> 8.0.1)
+  reek
   rspec-rails (~> 7.0.0)
   rspec-snapshot
   rswag-api
