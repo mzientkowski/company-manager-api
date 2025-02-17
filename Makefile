@@ -30,3 +30,6 @@ reek:
 
 fasterer:
 	bundle exec fasterer
+
+cov:
+	open tmp/coverage/index.html
