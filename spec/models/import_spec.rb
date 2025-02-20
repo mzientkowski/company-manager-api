@@ -1,4 +1,4 @@
-describe Import, type: :model do
+describe Import do
   subject(:import) { build(:import) }
 
   describe 'associations' do
@@ -51,30 +51,42 @@ describe Import, type: :model do
     end
   end
 
-  describe '#file_path' do
-    it 'returns the correct file path' do
-      expect(import.file_path).to eq(ActiveStorage::Blob.service.path_for(import.file.key))
+  describe '#file_download' do
+    let!(:downloaded_file) { import.save! && import.file_download }
+
+    after do
+      downloaded_file.close
+      downloaded_file.unlink
+    end
+
+    it 'downloads the file to a tempfile' do
+      expect(downloaded_file).to be_a(Tempfile)
+      expect(downloaded_file.read).to eq(import.file.download)
     end
   end
 
   describe '#run!' do
+    let(:tempfile) { instance_double(Tempfile, path: 'tmp_file_path', close: nil, unlink: nil) }
     let(:company_csv_parser) { instance_double(CompanyCsvParser) }
     let(:file_importer) { instance_double(FileImporter, import: true, imported_objects: [ double, double ], errors: []) }
 
     before do
-      allow(CompanyCsvParser).to receive(:new).with(import.file_path).and_return(company_csv_parser)
+      allow(import).to receive(:file_download).and_return(tempfile)
+      allow(CompanyCsvParser).to receive(:new).with(tempfile.path).and_return(company_csv_parser)
       allow(FileImporter).to receive(:new).with(import, company_csv_parser).and_return(file_importer)
+
+      expect(tempfile).to receive(:close)
+      expect(tempfile).to receive(:unlink)
     end
 
     context 'when import is successful' do
       it 'updates status to completed, timestamps and sets imported_count' do
         import.run!
 
-        expect(import.started_at).to be_a(ActiveSupport::TimeWithZone)
-        expect(import.completed_at).to be_a(ActiveSupport::TimeWithZone)
-
         expect(import.status).to eq('completed')
         expect(import.imported_count).to eq(2)
+        expect(import.started_at).to be_a(ActiveSupport::TimeWithZone)
+        expect(import.completed_at).to be_a(ActiveSupport::TimeWithZone)
       end
     end
 
