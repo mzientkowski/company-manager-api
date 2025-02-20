@@ -31,14 +31,17 @@ class Import < ApplicationRecord
     errors.add(:file, "no file") unless file.attached?
   end
 
-  def file_path
-    ActiveStorage::Blob.service.path_for(file.key)
+  def file_download
+    tmp_file = Tempfile.new.tap(&:binmode)
+    file.download { |chunk| tmp_file.write(chunk) }
+    tmp_file.tap(&:rewind)
   end
 
   def run!
     update!(status: Import.statuses[:running], started_at: Time.current)
     begin
-      file_importer = FileImporter.new(self, CompanyCsvParser.new(file_path))
+      tmp_file = file_download
+      file_importer = FileImporter.new(self, CompanyCsvParser.new(tmp_file.path))
       if file_importer.import
         update!(status: Import.statuses[:completed], imported_count: file_importer.imported_objects.size, completed_at: Time.current)
       else
@@ -47,6 +50,9 @@ class Import < ApplicationRecord
     rescue => exception
       update!(status: Import.statuses[:failed], error_log: self.error_log << exception.message)
       raise
+    ensure
+      tmp_file.close
+      tmp_file.unlink
     end
   end
 end
