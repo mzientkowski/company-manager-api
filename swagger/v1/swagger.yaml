@@ -78,6 +78,20 @@ components:
       - id
       - name
       - registration_number
+    companies:
+      type: array
+      items:
+        "$ref": "#/components/schemas/company"
+    companies_index:
+      type: object
+      properties:
+        data:
+          "$ref": "#/components/schemas/companies"
+        pagination:
+          "$ref": "#/components/schemas/pagination"
+      required:
+      - data
+      - pagination
 paths:
   "/api/v1/companies":
     get:
@@ -104,17 +118,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      "$ref": "#/components/schemas/company"
-                  pagination:
-                    "$ref": "#/components/schemas/pagination"
-                required:
-                - data
-                - pagination
+                "$ref": "#/components/schemas/companies_index"
     post:
       summary: Create a Company with Addresses
       tags:

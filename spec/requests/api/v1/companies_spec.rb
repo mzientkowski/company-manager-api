@@ -153,6 +153,17 @@ describe 'Companies API' do
               end
             end
 
+            response '400', 'Invalid CSV file with duplicated addresses' do
+              schema '$ref' => '#/components/schemas/bad_request'
+              let(:file) { fixture_file_upload('invalid_companies_uniq_address.csv', 'text/csv') }
+
+              run_test! do |response|
+                json = JSON.parse(response.body)
+                expect(json['errors']).to eq([ "Addresses must be unique", "Csv invalid data for company starting at row: 2" ])
+                expect(Company.count).to eq(0)
+              end
+            end
+
             context "when company already exist in db" do
               before do
                 create(:company, registration_number: 123456789)

@@ -21,4 +21,12 @@ class Company < ApplicationRecord
   validates :name, presence: true, length: { maximum: 256 }
   validates :registration_number, presence: true, uniqueness: true, numericality: { only_integer: true, greater_than: 0 }
   validates :addresses, presence: { message: "must have at least one" }
+
+  validate :validate_uniq_addresses
+
+  def validate_uniq_addresses
+    if addresses.present? && addresses.map(&:uniq_hash).uniq.size != addresses.size
+      errors.add(:addresses, "must be unique")
+    end
+  end
 end

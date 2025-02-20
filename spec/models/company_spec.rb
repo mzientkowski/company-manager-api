@@ -24,6 +24,12 @@ describe Company do
         company.addresses.build(attributes_for(:address))
         expect(company).to be_valid
       end
+
+      it 'is invalid with not unique addresses' do
+        company.addresses << company.addresses.first.dup
+        expect(company).to_not be_valid
+        expect(company.errors[:addresses]).to include("must be unique")
+      end
     end
   end
 
