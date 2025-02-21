@@ -44,6 +44,13 @@ describe Import, type: :model do
     it { should have_db_index(:status) }
   end
 
+  describe 'after_commit callback' do
+    it 'calls ImportsChannel.notify' do
+      expect(ImportsChannel).to receive(:notify).with(import)
+      import.save!
+    end
+  end
+
   describe '#file_path' do
     it 'returns the correct file path' do
       expect(import.file_path).to eq(ActiveStorage::Blob.service.path_for(import.file.key))

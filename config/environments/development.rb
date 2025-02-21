@@ -54,4 +54,6 @@ Rails.application.configure do
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
   config.active_storage.service = :local
+
+  config.action_cable.disable_request_forgery_protection = true
 end

@@ -22,6 +22,8 @@ class Import < ApplicationRecord
 
   has_one_attached :file, dependent: :destroy
 
+  after_commit -> { ImportsChannel.notify(self) }
+
   validates :total_count, :imported_count, :failed_count, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validate :check_file_presence
 

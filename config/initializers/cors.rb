@@ -14,3 +14,8 @@
 #       methods: [:get, :post, :put, :patch, :delete, :options, :head]
 #   end
 # end
+
+Rails.application.configure do
+  # config.action_cable.allowed_request_origins = ["https://rubyonrails.com", %r{http://ruby.*}]
+  config.action_cable.disable_request_forgery_protection = true
+end
