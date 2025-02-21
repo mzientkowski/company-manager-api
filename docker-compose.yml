@@ -10,6 +10,7 @@ services:
       POSTGRES_HOST: postgres-docker
       POSTGRES_USER: 'postgres' # FIXME: keep secret
       POSTGRES_PASSWORD: 'postgres' # FIXME: keep secret
+      REDIS_HOST: redis-docker
     command: bundle exec rails s -b '0.0.0.0'
     volumes:
       - .:/rails
@@ -17,6 +18,9 @@ services:
       - "3000:3000"
     networks:
       - company_manager_net
+    depends_on:
+      - postgres-docker
+      - redis-docker
   postgres-docker:
     image: public.ecr.aws/docker/library/postgres:16.1-alpine3.18
     environment:
@@ -36,5 +40,14 @@ services:
       interval: 3s
       timeout: 5s
       retries: 5
+  redis-docker:
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    image: public.ecr.aws/docker/library/redis:7.4-alpine3.21
+    command: redis-server --protected-mode no
+    ports:
+      - "6379:6379"
+    networks:
+      - company_manager_net
 volumes:
   postgres:
