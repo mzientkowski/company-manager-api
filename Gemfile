@@ -4,6 +4,8 @@ source "https://rubygems.org"
 gem "rails", "~> 8.0.1"
 # Use postgresql as the database for Active Record
 gem "pg", "~> 1.1"
+
+gem "redis", "~> 5"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 
@@ -55,9 +57,7 @@ group :development, :test do
   gem "rspec-snapshot"
   gem "factory_bot_rails", "~> 6.0"
   gem "rswag-specs"
-end
 
-group :test do
   gem "shoulda-matchers", "~> 6.0"
   gem "simplecov", require: false
 end
